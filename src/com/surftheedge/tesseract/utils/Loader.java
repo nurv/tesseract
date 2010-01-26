@@ -8,13 +8,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.UniqueTag;
 
 import pt.ist.fenixframework.Config;
 import pt.ist.fenixframework.FenixFramework;
-import pt.ist.fenixframework.pstm.RelationList;
 
 public class Loader {
+    public static String rootClass;
     public static String readFile(String path) {
 	File file = new File(path);
 	FileInputStream fis = null;
@@ -41,7 +43,7 @@ public class Loader {
 	    fis.close();
 	    bis.close();
 	    dis.close();
-	    
+
 	} catch (FileNotFoundException e) {
 	    e.printStackTrace();
 	} catch (IOException e) {
@@ -59,17 +61,28 @@ public class Loader {
     public static void init(String path) {
 	final Scriptable cfg = getConfig(readFile(path));
 	final Class r00tClass;
-    final Class modelClass;
+	final Class modelClass;
 	Config config = null;
+	Loader.rootClass = (String) cfg.get("rootClass", cfg);
 	try {
-	    r00tClass = Class.forName((String) cfg.get("rootClass", cfg));
-        modelClass = Class.forName((String) cfg.get("domainModelClass", cfg));
+	    r00tClass = Class.forName(Loader.rootClass);
+	    if (UniqueTag.NOT_FOUND != (UniqueTag) cfg.get("domainModelClass", cfg)){
+		modelClass = Class.forName((String) cfg.get("domainModelClass", cfg));
+	    }else{
+		modelClass = null;
+	    }
 	    config = new Config() {
 		{
-            if ((String) cfg.get("domainModelClass", cfg) != null){
-                domainModelClass = modelClass;
-            }
-		    domainModelPath = (String) cfg.get("domainModelPath", cfg);
+		    if (modelClass != null) {
+			domainModelClass = modelClass;
+		    }
+		    NativeArray na = (NativeArray) cfg.get("domainModelPaths", cfg);
+		    int length = (int) na.getLength();
+		    String[] array = new String[length];
+		    for(int i=0; i<length; i++ ){
+			array[i] = (String) na.get(i,na);
+		    }
+		    domainModelPaths = array;
 		    dbAlias = (String) cfg.get("dbAlias", cfg);
 		    dbUsername = (String) cfg.get("dbUsername", cfg);
 		    dbPassword = (String) cfg.get("dbPassword", cfg);

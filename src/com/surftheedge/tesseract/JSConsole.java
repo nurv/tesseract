@@ -18,11 +18,13 @@ import jline.SimpleCompletor;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.UniqueTag;
 
 import pt.ist.fenixframework.pstm.Transaction;
 
 import com.surftheedge.tesseract.jsbridge.EvaluationTransaction;
 import com.surftheedge.tesseract.jsbridge.TopLevelContext;
+import com.surftheedge.tesseract.utils.Loader;
 
 public class JSConsole {
     private List<String> importDirectory;
@@ -46,6 +48,7 @@ public class JSConsole {
 	    reader.addCompletor(new SimpleCompletor(new String[]{ "$", "tes", "java", "Packages", "importPackage", "importClass"}));
 	    reader.addCompletor(new SimpleCompletor(new String[]{ "where", "select", "selectAll", "orderBy", "distinct","count","any", "reverse", "first", "last", "elementAt", "concat","intersect","defaultIfEmpty","elementAtOrDefault","firstOrDefault","lastOrDefault","table","limit","types"}));
 	}
+	cx.evaluateString(scope, "importClass(Packages." + Loader.rootClass + ");", "<boot>", 0, null);
     }
 
     public String reader(BufferedReader in) {

@@ -1,9 +1,8 @@
 {
-    domainModelClass: "pt.ist.fenixframework.pstm.dml.FenixDomainModelWithOCC",
-    domainModelPath: "/home/nurv/bolsa/workspace/fenix/config/domain_model.dml",
-    dbAlias: "//localhost:3306/ciapl",
+    domainModelPaths: ["/fears.dml"],
+    dbAlias: "//localhost:3306/fears",
     dbUsername: "root",
     dbPassword: "",
-    rootClass: "net.sourceforge.fenixedu.domain.RootDomainObject",
+    rootClass: "eu.ist.fears.server.domain.FearsApp",
     updateRepositoryStructureIfNeeded: true
 }

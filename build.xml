@@ -16,8 +16,8 @@
 	<target name="compile" depends="init">
 		<javac debug="on" srcdir="${src}" destdir="${build}" classpath="${lib}/javassist.jar:${lib}/jline.jar:${lib}/js.jar">
 			<classpath>
-				<pathelement path="/home/nurv/bolsa/workspace/fenix/web/WEB-INF/classes"/>
-				<fileset dir="/home/nurv/bolsa/workspace/fenix/web/WEB-INF/lib">
+				<pathelement path="/Users/nurv/workspace/Fears/war/WEB-INF/classes"/>
+				<fileset dir="/Users/nurv/workspace/Fears/war/WEB-INF/lib">
 					<include name="*.jar" />
 				</fileset>
 			</classpath>
