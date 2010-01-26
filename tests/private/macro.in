@@ -1,0 +1,16 @@
+2 + 3
+macro /([0-9]+)\s*\+/ { $1$ * }
+2 + 3
+ist.leic.pa.utils.MacroManager.macros();
+ist.leic.pa.utils.MacroManager.deleteMacro(1);
+2 + 3
+macro /entity ([^;]*);/ { block{
+int $1$ = 0;
+String &{ "get" + "$1$".substring(0, 1).toUpperCase() + 
+	   "$1$".substring(1).toLowerCase() } (){
+	return %{ "$1$" + " is :"} + $1$;
+}
+}}
+entity knight;
+knight
+getKnight()

@@ -1,0 +1,3 @@
+Math.max(Math.cos(Math.PI),Math.sin(Math.E))
+static import java.lang.Math;
+max(cos(PI),sin(E))

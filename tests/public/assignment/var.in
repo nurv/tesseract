@@ -1,0 +1,14 @@
+int foo = 1;
+foo
+foo = foo + 1
+foo++
+++foo
+int bar = 0;
+int getBar() { return bar; } 
+void setBar(int value) { bar = value; }
+getBar()
+double bar = 3.14159;
+getBar()
+setBar(5);
+bar
+getBar()

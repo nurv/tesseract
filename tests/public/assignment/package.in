@@ -1,0 +1,13 @@
+javax.swing.JFrame frame = new javax.swing.JFrame("My Frame");
+java.awt.Container content = frame.getContentPane();
+content.add(new javax.swing.JButton("Hello, World!"));
+frame.setSize(300,100);
+frame.setVisible(true);
+import java.awt;
+import javax.swing;
+JFrame frame = new JFrame("My Frame");
+Container content = frame.getContentPane();
+content.add(new JButton("Hello, World!"));
+frame.setSize(400,150);
+frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+frame.setVisible(true);

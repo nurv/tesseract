@@ -1,0 +1,19 @@
+int i=5;
+for(int j=0; j<i; j++){
+	System.out.println("ho ho");
+}
+if(i==4){
+	i++;
+}else{
+i--;
+}
+int j=0;
+while(j<i){
+	System.out.println("j=" + j++);
+}
+switch(j){
+	case 4:
+			System.out.println("j=" + j);
+	default:
+			System.out.println("bling");
+}

@@ -1,0 +1,23 @@
+wrappable int fact(int v){
+	if (v == 0){
+		return 1;
+	}else{
+		return v * fact(v - 1);
+	}
+}
+void traceBefore(String f,Object[] v){
+	System.out.println(f + "("+v[0]+")" + "=>");
+}
+void traceAfter(String f,Object[] v, int result){
+	System.out.println(f + "("+v[0]+")" + "<= " + result);
+}
+%before fact(int) add traceBefore(java.lang.String,[Ljava.lang.Object;);
+%after fact(int) add traceAfter(java.lang.String,[Ljava.lang.Object;,int);
+fact(5)
+%before fact(int) del traceBefore(java.lang.String,[Ljava.lang.Object;);
+%after fact(int) del traceAfter(java.lang.String,[Ljava.lang.Object;,int);
+fact(5)
+ist.leic.pa.utils.TracingManager.trace("fact(int)");
+fact(6)
+ist.leic.pa.utils.TracingManager.untrace("fact(int)");
+fact(6)

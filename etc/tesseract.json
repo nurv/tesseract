@@ -1,0 +1,9 @@
+{
+    domainModelClass: "pt.ist.fenixframework.pstm.dml.FenixDomainModelWithOCC",
+    domainModelPath: "/home/nurv/bolsa/workspace/fenix/config/domain_model.dml",
+    dbAlias: "//localhost:3306/ciapl",
+    dbUsername: "root",
+    dbPassword: "",
+    rootClass: "net.sourceforge.fenixedu.domain.RootDomainObject",
+    updateRepositoryStructureIfNeeded: true
+}

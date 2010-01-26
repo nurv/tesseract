@@ -1,0 +1,13 @@
+block {
+int foo = 1;
+int bar = 2;
+}
+foo
+bar
+
+block {
+int foo(int i) { if (i == 0) return 0; else return bar(i - 1); }
+int bar(int i) { if (i == 0) return 0; else return foo(i - 1); }
+}
+foo(5)
+

@@ -1,0 +1,6 @@
+1
+1 + 2
+123 * 456
+"Foo"
+"Foo" + "Bar"
+Math.sin(Math.PI/2)

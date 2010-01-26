@@ -1,0 +1,5 @@
+int foo = 1;
+int foo = 2;
+double foo = 2;
+double foo = 3;
+String foo = "";

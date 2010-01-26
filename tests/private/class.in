@@ -1,0 +1,24 @@
+class Example {
+	int i = 0;
+	int test(){
+		i++;
+		return i;
+	}
+}
+Example j = new Example();
+j.test()
+j.test();
+j.i
+j.i = 1;
+j.i++;
+j.test();
+int hello = 12;
+class ExampleX extends ist.leic.pa.stack.Stack {
+	int hello(){
+		return hello--;
+	}
+}
+ExampleX.getCurrentEvalLevel()
+ExampleX ex = new ExampleX();
+ex.hello()
+ex.hello()

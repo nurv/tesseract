@@ -1,0 +1,7 @@
+.* # Ignore all dotfiles...
+!.gitignore # except for .gitignore
+*~
+bin/*
+build/*
+lib/mjava.jar
+tests/*/*.result

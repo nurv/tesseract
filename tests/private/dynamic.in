@@ -1,0 +1,11 @@
+dynamic int foo(int i) {
+	return 0;
+}
+int bar (int z) {
+	return foo(z);
+}
+bar (4)
+dynamic int foo(int i) {
+	return 1;
+}
+bar (4)

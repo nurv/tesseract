@@ -1,0 +1,30 @@
+> > > > > > fact(int)(5)=>
+fact(int)(4)=>
+fact(int)(3)=>
+fact(int)(2)=>
+fact(int)(1)=>
+fact(int)(0)=>
+fact(int)(0)<= 1
+fact(int)(1)<= 1
+fact(int)(2)<= 2
+fact(int)(3)<= 6
+fact(int)(4)<= 24
+fact(int)(5)<= 120
+120
+> > > 120
+> > //fact(6) =>
+//  fact(5) =>
+//    fact(4) =>
+//      fact(3) =>
+//        fact(2) =>
+//          fact(1) =>
+//            fact(0) =>
+//            fact(0) <= 1
+//          fact(1) <= 1
+//        fact(2) <= 2
+//      fact(3) <= 6
+//    fact(4) <= 24
+//  fact(5) <= 120
+//fact(6) <= 720
+720
+> > 

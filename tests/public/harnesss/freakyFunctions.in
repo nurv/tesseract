@@ -1,0 +1,17 @@
+int foo(int a) { return a; }
+foo(1)
+String foo(int a, String b){ return b+a; }
+foo(1,"b")
+int fact(int v) {if(v == 0){return 1;}else{return v*fact(v-1);}}
+fact(5)
+int fact(int v){if(v == 0)return 1;else return v*fact(v-1);}
+fact(5)
+int fact(int v){{if(v == 0)return 1;else return v*fact(v-1);}}
+fact(5)
+int fact(int v){{System.out.print("garth knight");}{if(v == 0)return 1;else return v*fact(v-1);}}
+fact(5)
+int fact(int v){(true)?v=v-1:v=v+1;{if(v == 0)return 1;else return v*fact(v-1);}}
+fact(5)
+int fact(int v){(true&&true||false&&true)?v=v-1:v=v+1;{if(v == 0)return 1;else return v*fact(v-1);}}
+fact(5)
+String foo="blah";

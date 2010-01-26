@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<project name="mjava" default="jar" basedir=".">
+
+	<property name="src" value="src" />
+	<property name="build" value="build" />
+	<property name="lib" value="lib" />
+
+	<target name="init">
+		<mkdir dir="${build}" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${build}" />
+		<delete file="${lib}/mjava.jar" />
+	</target>
+	<target name="compile" depends="init">
+		<javac debug="on" srcdir="${src}" destdir="${build}" classpath="${lib}/javassist.jar:${lib}/jline.jar:${lib}/js.jar">
+			<classpath>
+				<pathelement path="/home/nurv/bolsa/workspace/fenix/web/WEB-INF/classes"/>
+				<fileset dir="/home/nurv/bolsa/workspace/fenix/web/WEB-INF/lib">
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="jar" depends="compile">
+		<jar destfile="${lib}/mjava.jar" basedir="${build}" />
+	</target>
+
+	<target name="test" depends="jar">
+		<exec executable="sh">
+			<arg value="tests.sh" />
+		</exec>
+	</target>
+</project>

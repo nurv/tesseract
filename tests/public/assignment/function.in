@@ -1,0 +1,14 @@
+int fact (int n) { return (n == 0) ? 1 : n * fact(n - 1); }
+fact(3)
+int fact (int n) { if (n == 0) return 1; else return n * fact(n - 1); }
+fact(4)
+int fact (int n) { int r = 1; for(; n > 0; n--) r *= n; return r; }
+fact(5)
+int fact (int n) { int r = 1; while(n > 0) r *= n--; return r; }
+fact(6)
+int foo() { return 1; }
+int bar() { return foo(); }
+bar()
+int foo() { return 2; }
+foo()
+bar()
