@@ -37,48 +37,6 @@ public class InternalRepresentation {
 	return "'" + stringForCharInChar(v) + "'";
     }
 
-    public static String convert(String v) {
-	if (v == null) {
-	    return convert((Object) v);
-	}
-	String result = "";
-	char[] splash = v.toCharArray();
-	for (char c : splash) {
-	    result += stringForCharInString(c);
-	}
-
-	return "\"" + result + "\"";
-    }
-
-    private static String stringForCharInChar(char c) {
-	switch (c) {
-	case '\b':
-	    return "\\b";
-
-	case '\f':
-	    return "\\f";
-
-	case '\n':
-	    return "\\n";
-
-	case '\r':
-	    return "\\r";
-
-	case '\t':
-	    return "\\t";
-
-	case '\'':
-	    return "\\'";
-
-	case '\\':
-	    return "\\\\";
-
-	default:
-	    return "" + c;
-
-	}
-    }
-
     private static String stringForCharInString(char c) {
 	switch (c) {
 	case '\b':
