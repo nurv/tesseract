@@ -11,14 +11,12 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.List;
 
-import jline.ClassNameCompletor;
 import jline.ConsoleReader;
 import jline.SimpleCompletor;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.UniqueTag;
 
 import pt.ist.fenixframework.pstm.Transaction;
 
@@ -43,10 +41,7 @@ public class JSConsole {
 	JSConsole.instance = this;
 	if (System.console() != null) {
 	    reader = new ConsoleReader();
-	    
-	    reader.addCompletor(new SimpleCompletor(TopLevelContext.names));
-	    reader.addCompletor(new SimpleCompletor(new String[]{ "$", "tes", "java", "Packages", "importPackage", "importClass"}));
-	    reader.addCompletor(new SimpleCompletor(new String[]{ "where", "select", "selectAll", "orderBy", "distinct","count","any", "reverse", "first", "last", "elementAt", "concat","intersect","defaultIfEmpty","elementAtOrDefault","firstOrDefault","lastOrDefault","table","limit","types"}));
+	    reader.addCompletor(new SemanticIntrospection(cx,scope));
 	}
 	cx.evaluateString(scope, "importClass(Packages." + Loader.rootClass + ");", "<boot>", 0, null);
     }

@@ -3,7 +3,6 @@ package com.surftheedge.tesseract.jsbridge;
 import jvstm.TransactionalCommand;
 
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
@@ -23,7 +22,7 @@ public class EvaluationTransaction implements TransactionalCommand {
     public void doIt() {
 	cx.setErrorReporter(new ToolErrorReporter(false, System.out));
 	try {
-	    Object result = cx.evaluateString(scope, source, "<cmd>", 1, null);
+	    Object result = cx.evaluateString(scope,source, "<cmd>", 1, null);
 	    // Avoid printing out undefined or function definitions.
 	    if (result != Context.getUndefinedValue() && !(result instanceof Function && source.trim().startsWith("function"))) {
 		try {

@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.apache.ojb.broker.PersistenceBrokerException;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.Scriptable;
@@ -73,9 +74,6 @@ public class Loader {
 	    }
 	    config = new Config() {
 		{
-		    if (modelClass != null) {
-			domainModelClass = modelClass;
-		    }
 		    NativeArray na = (NativeArray) cfg.get("domainModelPaths", cfg);
 		    int length = (int) na.getLength();
 		    String[] array = new String[length];
@@ -95,6 +93,11 @@ public class Loader {
 	    System.out.println("Make sure that every class required is in the classpath.");
 	    System.exit(-1);
 	}
-	FenixFramework.initialize(config);
+	try{
+	    FenixFramework.initialize(config);
+	}catch (Error e) {
+	    System.out.println("Initialization failed. Probably you don't have the Persistency Backend running. ");
+	    System.exit(-1);
+	}
     }
 }

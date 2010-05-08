@@ -34,7 +34,7 @@ public class InternalRepresentation {
     }
 
     public static String convert(char v) {
-	return "'" + stringForCharInChar(v) + "'";
+	return "'" + stringForCharInString(v) + "'";
     }
 
     private static String stringForCharInString(char c) {
