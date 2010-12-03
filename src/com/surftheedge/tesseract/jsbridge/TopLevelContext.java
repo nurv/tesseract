@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Collection;
-import java.util.List;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
@@ -16,17 +15,19 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
+import pt.ist.fenixframework.pstm.Transaction;
+
 import com.surftheedge.tesseract.JSConsole;
+import com.surftheedge.tesseract.config.Config;
 
 public class TopLevelContext extends ImporterTopLevel {
 
     private static final long serialVersionUID = 1L;
-    private JSConsole engine;
-    public static String[] names = { "map", "reduce", "filter", "print", "printf", "whatis", "find","run","reloadRuntime" };
+    public static String[] names = { "map", "reduce", "filter", "print", "printf", "typeOf", "find","run","reloadRuntime","slurp",};
     public TopLevelContext() {
     }
 
-    public TopLevelContext(Context cx) {
+    public TopLevelContext(Context cx,JSConsole engine) {
 	super();
 	init(cx);
     }
@@ -43,13 +44,19 @@ public class TopLevelContext extends ImporterTopLevel {
 	try {
 	    fir = new FileReader(file);
 	    BufferedReader br = new BufferedReader(fir);
-	    JSConsole.instance.loopFile(br, filename);
+	    JSConsole.getEngine(cx, thisObj).loopFile(br, filename);
 	} catch (FileNotFoundException e) {
 	    System.err.print("File '" + filename + "' was not found");
 	}
     }
+    
+    public static Object slurp(Context cx, Scriptable thisObj, Object[] args, Function funObj){
+	String filename = (String) args[0];
+	return Slurp.slurp(filename);
+    }
+    
     public static void reloadRuntime(Context cx, Scriptable thisObj, Object[] args, Function funObj) {
-	JSConsole.instance.loadResources();
+	JSConsole.getEngine(cx, thisObj).loadResources();
     }
 
     public static Object map(Context cx, Scriptable thisObj, Object[] args, Function funObj) {
@@ -126,8 +133,13 @@ public class TopLevelContext extends ImporterTopLevel {
 	return null;
     }
 
-    public static Object whatis(Context cx, Scriptable thisObj, Object[] args, Function funObj) {
-	return args[0].getClass().getName();
+    public static Object typeOf(Context cx, Scriptable thisObj, Object[] args, Function funObj) {
+	if (args[0] instanceof NativeJavaObject){
+	    NativeJavaObject obj = (NativeJavaObject) args[0];
+	    return obj.unwrap().getClass().getName();
+	}else{
+	    return args[0].getClass().getName();
+	}
     }
 
 }

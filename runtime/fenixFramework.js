@@ -8,7 +8,7 @@
  * Author: Artur Ventura
  */
  
-tes = {
+tesseract.fenixFramework = {
     /* inspObj : inspects DomainModel entity instances acording with
      *           their declaration in the cfg.dml file.
      */
@@ -23,9 +23,9 @@ tes = {
 
 	map(slots, function(u) {
 	    var x = "" + u.getName();
-	    table1.push( ["" + u.getName(),obj[tes.utils.getter(x)]()]);
+	    table1.push( ["" + u.getName(),obj[tesseract.utils.getter(x)]()]);
 	});
-	tes.utils.printTable(table1,[ "slot", "value" ]);
+	tesseract.utils.printTable(table1,[ "slot", "value" ]);
 
 	var relations = FenixFramework.getDomainModel().findClass(
 	    obj.getClass().getName()).getRoleSlotsList();
@@ -37,7 +37,7 @@ tes = {
         try {
 	    if (r.getMultiplicityUpper() == 1) {
  
-		var k = obj[tes.utils.getter(x)]()
+		var k = obj[tesseract.utils.getter(x)]()
 		if (k == null) {
 		    xinobi = "<null>"
 		} else {
@@ -53,7 +53,7 @@ tes = {
         
 	    } else {
 		xinobi = "" + r.getType().getFullName() + "(<lenght: "
-		    + obj[tes.utils.getter(x)]()
+		    + obj[tesseract.utils.getter(x)]()
 		    .size() + ">)";
 	    }
         } catch(e){
@@ -61,7 +61,7 @@ tes = {
         }
 	    table2.push( [ x, xinobi ]);
 	});
-	tes.utils.printTable(table2,[ "relation", "value/size" ]);
+	tesseract.utils.printTable(table2,[ "relation", "value/size" ]);
     },
 
     /* inspEnt : inspects a class from the DomainModel. it can recive
@@ -90,7 +90,7 @@ tes = {
 	map(slots, function(u) {
 	    table1.push( [ "" + u.getName(), "" + u.getTypeName() ]);
 	});
-	tes.utils.printTable(table1,[ "slot", "type" ]);
+	tesseract.utils.printTable(table1,[ "slot", "type" ]);
 
 	var table2 = [];
 
@@ -108,7 +108,7 @@ tes = {
 	    }
 	    table2.push( [ name, type, mult ]);
 	});
-	tes.utils.printTable(table2,[ "relation", "type", "multiplicity" ]);
+	tesseract.utils.printTable(table2,[ "relation", "type", "multiplicity" ]);
     },
     
     /* inspRel : displays a table with the objects in this
@@ -133,7 +133,7 @@ tes = {
 
 	var slots = FenixFramework.getDomainModel().findClass(
 	    relation.getType().getFullName()).getSlotsList();
-	var list = object[tes.utils.getter(rel)]()
+	var list = object[tesseract.utils.getter(rel)]()
 	var header = [];
 	if (!sel || (sel && select["ID"])) {
 	    header.push("ID");
@@ -159,7 +159,7 @@ tes = {
 		
 		queried.map(
 		    function(s) {
-			line.push(o[tes.utils.getter(s)]());
+			line.push(o[tesseract.utils.getter(s)]());
 		    });
 		xtraStuff && xtraStuff.map(function(req) {
 		    line.push("" + req.func(o).toString());
@@ -169,12 +169,12 @@ tes = {
 	xtraStuff && xtraStuff.map(function(o) {
 	    header.push(o.name)
 	});
-	print(object.getClass().getName() + "." + tes.utils.getter(rel) + "():"
+	print(object.getClass().getName() + "." + tesseract.utils.getter(rel) + "():"
 	      + relation.getType().getFullName() + "\n");
-	tes.utils.printTable(table,header);
-    },
+	tesseract.utils.printTable(table,header);
+    }};
     
-    utils : {
+tesseract.utils = {
 	
 	/* printTable : prints a table.
          */
@@ -242,4 +242,3 @@ tes = {
 	    return "get" + thing.charAt(0).toUpperCase() + thing.slice(1)
 	}
     }
-}

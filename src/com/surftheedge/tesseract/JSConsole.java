@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import jline.ConsoleReader;
-import jline.SimpleCompletor;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.EvaluatorException;
@@ -20,6 +19,7 @@ import org.mozilla.javascript.Scriptable;
 
 import pt.ist.fenixframework.pstm.Transaction;
 
+import com.surftheedge.tesseract.config.Config;
 import com.surftheedge.tesseract.jsbridge.EvaluationTransaction;
 import com.surftheedge.tesseract.jsbridge.TopLevelContext;
 import com.surftheedge.tesseract.utils.Loader;
@@ -27,23 +27,33 @@ import com.surftheedge.tesseract.utils.Loader;
 public class JSConsole {
     private List<String> importDirectory;
     private Context cx;
-    private final String[] prompts = { "tes> ", "     " };
+    private final String prompts = "tes";
     private Scriptable scope;
     private PrintStream ps = new PrintStream(System.out);
     private HashMap<String, File> loadedFiles = new HashMap<String, File>();
-    public static JSConsole instance;
     public ConsoleReader reader;
+    private Scriptable config;
 
-    public JSConsole(List<String> importDirectory) throws IOException {
+    public JSConsole(List<String> importDirectory, String configFile) throws IOException {
 	this.importDirectory = importDirectory;
 	cx = Context.enter();
-	scope = new TopLevelContext(cx);
-	JSConsole.instance = this;
+	scope = new TopLevelContext(cx,this);
+	config = Config.newConfig(configFile);
+	Scriptable env = cx.newObject(scope);
+	env.put("config", env, config);
+	env.put("engine", env, cx.getWrapFactory().wrapNewObject(cx, env,this));
+	scope.put("tesseract", scope, env);
+    	Loader.load(config);
+	
 	if (System.console() != null) {
 	    reader = new ConsoleReader();
 	    reader.addCompletor(new SemanticIntrospection(cx,scope));
 	}
-	cx.evaluateString(scope, "importClass(Packages." + Loader.rootClass + ");", "<boot>", 0, null);
+	cx.evaluateString(scope, "importClass(Packages." + Config.get("rootClass",config) + ");", "<boot>", 0, null);
+    }
+    
+    public static JSConsole getEngine(Context cx, Scriptable scope){
+	return (JSConsole) cx.evaluateString(scope, "tesseract.engine", "<getEngine>", 0, null);
     }
 
     public String reader(BufferedReader in) {
@@ -53,7 +63,13 @@ public class JSConsole {
 	    String newline;
 	    try {
 		if (System.console() != null) {
-		    newline = reader.readLine(wrote ?  "" : prompts[0]);
+		    String prompt ;
+		    if (Config.JSbool(Config.get("canWrite", config)) && !Config.JSbool(Config.get("notWarnWhenCanWrite", config))){
+			prompt = "\u001b[1;41m" + prompts + " *Write Mode ON*>\u001b[m";    
+		    }else{
+			prompt = prompts + ">";
+		    }
+		    newline = reader.readLine(wrote ?  "" : prompt + " ");
 		    wrote = true;
 		} else {
 		    newline = in.readLine();
@@ -105,7 +121,7 @@ public class JSConsole {
 		break;
 	    }
 
-	    Transaction.withTransaction(true, new EvaluationTransaction(cx, scope, source));
+	    Transaction.withTransaction(!Config.JSbool(Config.get("canWrite", cx,scope)), new EvaluationTransaction(cx, scope, source));
 	}
 	if (System.console() != null) {
 	    ps.println();
@@ -138,7 +154,9 @@ public class JSConsole {
 	    try {
 		FileReader fir = new FileReader(file);
 		BufferedReader br = new BufferedReader(fir);
-		System.out.println("loaded: " + f.getKey());
+		if (Config.JSbool(Config.get("verboseLoading", cx,scope))){
+		    System.out.println("loaded: " + f.getKey());
+		}
 		loopFile(br, f.getKey());
 	    } catch (FileNotFoundException e) {
 		System.out.println("file not found: " + f.getKey());
@@ -149,6 +167,8 @@ public class JSConsole {
     public void exec() {
 	BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 	loadResources();
+	System.out.println("");
 	loopSource(in);
     }
+
 }

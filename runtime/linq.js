@@ -9,8 +9,8 @@
  */
 
 (function() {
-    $ = function(aList,X) {
-        return new $.fn.init(aList,X);
+    from = function(aList,X) {
+        return new from.fn.init(aList,X);
     };
     
     function aList(){
@@ -27,14 +27,14 @@
 		    return item[thing]
 		}
 	    }else{
-		return item[tes.util.getter(thing)]()
+		return item[tesseract.utils.getter(thing)]()
 	    }
 	}else{
 	    return thing(item,index);
 	}
     }
     
-    $.fn = $.prototype = {
+    from.fn = from.prototype = {
         init: function(list,X) {
 	    if (list["map"]){
 		var x = aList();
@@ -66,7 +66,7 @@
 
 	    if (this.actions.length > 1)
 		ops = this.actions.reduce(function(x,y){
-		    return x + "$" + y
+		    return x + ">>" + y
 		}) + ", ";
 	    if (this.actions.length == 1){
 		ops =  this.actions[0] + ", ";
@@ -84,7 +84,7 @@
                 }
 	    });
 	    
-            return new $(newArray,this.actions.concat(["where"]));
+            return new from(newArray,this.actions.concat(["where"]));
         },
 	
         select: function(thing) {
@@ -96,7 +96,7 @@
 			newArray.add(val);
                     }
 		});
-            return new $(newArray,this.actions.concat(["select"]));
+            return new from(newArray,this.actions.concat(["select"]));
         },
 
 	selectAll: function(thing) {
@@ -109,7 +109,7 @@
 		    newArray.addAll(val);
 		}
 	    });
-            return new $(newArray,this.actions.concat(["selectAll"]));
+            return new from(newArray,this.actions.concat(["selectAll"]));
         },
 	
 	orderBy: function(clause) {
@@ -123,7 +123,7 @@
 	    }else{
 		java.util.Collections.sort(tempArray);
 	    }
-            return new $(tempArray,this.actions.concat(["orderBy"]));
+            return new from(tempArray,this.actions.concat(["orderBy"]));
 	},
         distinct: function(thing) {
             var dict = new java.util.HashSet();
@@ -139,7 +139,7 @@
 	    });
 	    
             dict = null;
-            return new $(result,this.actions.concat(["distinct"]));
+            return new from(result,this.actions.concat(["distinct"]));
         },
 	count: function(clause) {
             if (clause == null)
@@ -158,7 +158,7 @@
             var x =  aList();
             x.addAll(this.items);
 	    java.util.Collections.reverse(x);
-            return new $(x,this.actions.concat(["reverse"]));
+            return new from(x,this.actions.concat(["reverse"]));
         },
 	first: function(clause) {
             if (clause != null) {
@@ -190,7 +190,7 @@
 	    var x = aList();
             java.util.Collections.copyArray(this.items,x);
 	    x.addAll(arr);
-            return new $(x,this.actions.concat(["concat"]));
+            return new from(x,this.actions.concat(["concat"]));
         },
 	
 	intersect: function(secondArray, clauseMethod) {
@@ -212,7 +212,7 @@
 		})
 	    });
 	    
-        return new $(result,this.actions.concat(["intersect"]));
+        return new from(result,this.actions.concat(["intersect"]));
         },
 	defaultIfEmpty: function(defaultValue) {
 	    if (this.items.size() == 0) {
@@ -265,10 +265,44 @@
 		headers = ["#"].concat(headers);
 	    }
 	    if (!opts.noHeader && he){
-		tes.utils.printTable(table,headers);
+		tesseract.utils.printTable(table,headers);
 	    }else{
-		tes.utils.printTable(table);
+		tesseract.utils.printTable(table);
 	    }
+	},
+	arrayTable: function(he,opts){
+	    opts = opts || {};
+	    if (he && !(typeof(he) === 'object' && he.constructor == Array)){
+	        he = [he];
+        }
+	    headers = he || ["toString"];
+
+	    var table = map(this.items,function(o,i) {
+		var val = headers.map(function(h){
+		    if (h.label){
+			return getValue(o, h.slot || h.func, i);
+		    }else{
+			return getValue(o, h, i);
+		    }
+		});
+		if (opts.index){
+		    return [i].concat(val);
+		}else{
+		    return val;
+		}
+	    });
+	    headers = headers.map(function(h){
+		if ((typeof h) == "string"){
+		    return h;
+		}else{
+		    return h.label;
+		}
+	    });
+	    if (opts.index){
+		headers = ["#"].concat(headers);
+	    }
+
+		return [headers,table];
 	},
 	limit: function (lower,upper){
 	    if(!upper){
@@ -286,7 +320,7 @@
 	    range(lower,upper).map(function (index){
 		val.add(hack.items.get(index));
 	    });
-	    return new $(val,this.actions.concat(["limit"]));
+	    return new from(val,this.actions.concat(["limit"]));
 	},
 	types: function (){
 	    var rep = new java.util.HashSet();
@@ -299,14 +333,14 @@
 		}
 	    });
 	    var l = new java.util.ArrayList(rep);
-	    return new $(l,this.actions.concat(["types"]));
+	    return new from(l,this.actions.concat(["types"]));
 	},
     inspect: function (thing){
-        tes.inspObj(this.items.get(thing));
+    	tesseract.fenixFramework.inspObj(this.items.get(thing));
     },
     entity: function (thing){
-        tes.inspEnt(this.items.get(thing).getClass());
+    	tesseract.fenixFramework.inspEnt(this.items.get(thing).getClass());
     }
     };
-    $.fn.init.prototype = $.fn;
+    from.fn.init.prototype = from.fn;
 })();

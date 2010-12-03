@@ -22,11 +22,13 @@ import jline.Completor;
 import jvstm.TransactionalCommand;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.tools.ToolErrorReporter;
 
 import pt.ist.fenixframework.pstm.Transaction;
 
-import com.surftheedge.tesseract.utils.Loader;
+import com.surftheedge.tesseract.config.Config;
 
 public class SemanticIntrospection implements Completor {
     ArrayList<String> classNames;
@@ -90,7 +92,8 @@ public class SemanticIntrospection implements Completor {
 	domainClasses = new ArrayList<String>();
 	this.cx = cx;
 	this.scope = scope;
-	String domainPackage = Loader.rootClass.substring(0, Loader.rootClass.lastIndexOf('.'));
+	String rootClass = (String) Config.get("rootClass", cx, scope);
+	String domainPackage = rootClass.substring(0, rootClass.lastIndexOf('.'));
 	for (String i : classNames) {
 	    classNames.add(i);
 	    if (i.startsWith(domainPackage)) {
@@ -206,104 +209,111 @@ public class SemanticIntrospection implements Completor {
 
 	return holder;
     }
-
+    
     @SuppressWarnings("unchecked")
     public int complete(final String buffer, int cursor, final List candidates) {
-	if (buffer.trim().equals("") || buffer.equals(".")) {
-	    return 0;
-	}
-	String sect = buffer.substring(0, cursor);
-	final String rest = buffer.substring(cursor);
-	int split = reverseParser(sect);
-	String element = sect.substring(sect.length() - split);
-	String begin = sect.substring(0, sect.length() - split);
-	int sep = element.lastIndexOf('.');
-	final String searchPart;
-	final String sugestion;
-	final ArrayList<String> values = new ArrayList<String>();
-	if (sep == -1) {
-	    sugestion = element;
-	    searchPart = "";
-	    Transaction.withTransaction(true, new TransactionalCommand() {
-		public void doIt() {
-		    for (Object k : scope.getIds()) {
-			String s = cx.toString(k);
-			values.add(s);
-		    }
-		    if (scope.getParentScope() != null) {
-			for (Object k : scope.getParentScope().getIds()) {
-			    String s = cx.toString(k);
-			    values.add(s);
-			}
-		    }
-		    if (scope.getPrototype() != null) {
-			for (Object k : scope.getPrototype().getIds()) {
-			    String s = cx.toString(k);
-			    values.add(s);
-			}
-		    }
+	cx.setErrorReporter(new ToolErrorReporter(false, System.out));
+	
+	try {
+	    if (buffer.trim().equals("") || buffer.equals(".")) {
+		return 0;
+	    }
+	    String sect = buffer.substring(0, cursor);
+	    final String rest = buffer.substring(cursor);
+	    int split = reverseParser(sect);
 
-		}
-	    });
-	} else if (element.charAt(element.length() - 1) == '.') {
-	    searchPart = element.substring(0, sep);
-	    sugestion = "";
-	    Transaction.withTransaction(true, new TransactionalCommand() {
-		public void doIt() {
-		    Object o = cx.evaluateString(scope, searchPart, "<auto-complete>", 0, null);
-		    for (Object k : ((Scriptable) o).getIds()) {
-			String s = cx.toString(k);
-			values.add(s);
-		    }
-		    if (((Scriptable) o).getPrototype() != null) {
-			for (Object k : ((Scriptable) o).getPrototype().getIds()) {
-			    String s = cx.toString(k);
+	    
+	    int sep = sect.lastIndexOf('.');
+	    
+	    final String searchPart;
+	    final String sugestion;
+	    final ArrayList<String> values = new ArrayList<String>();
+	    if (sep == -1) {
+		sugestion = sect;
+		searchPart = "";
+		Transaction.withTransaction(true, new TransactionalCommand() {
+		    public void doIt() {
+			for (Object k : scope.getIds()) {
+			    String s = Context.toString(k);
 			    values.add(s);
 			}
-		    }
-		}
-	    });
-	} else {
-	    searchPart = element.substring(0, sep);
-	    sugestion = element.substring(sep + 1);
-	    Transaction.withTransaction(true, new TransactionalCommand() {
-		public void doIt() {
-		    Object o = cx.evaluateString(scope, searchPart, "<auto-complete>", 0, null);
-		    for (Object k : ((Scriptable) o).getIds()) {
-			String s = cx.toString(k);
-			values.add(s);
-		    }
-		    if (((Scriptable) o).getPrototype() != null) {
-			for (Object k : ((Scriptable) o).getPrototype().getIds()) {
-			    String s = cx.toString(k);
-			    values.add(s);
+			if (scope.getParentScope() != null) {
+			    for (Object k : scope.getParentScope().getIds()) {
+				String s = Context.toString(k);
+				values.add(s);
+			    }
 			}
-		    }
-		}
-	    });
-	}
+			if (scope.getPrototype() != null) {
+			    for (Object k : scope.getPrototype().getIds()) {
+				String s = Context.toString(k);
+				values.add(s);
+			    }
+			}
 
-	for (String s : values) {
-	    if (!s.contains("$")) {
-		if (s.equals(sugestion)) {
-		    candidates.clear();
-		    if (sep == -1) {
-			candidates.add(begin + s);
-		    } else {
-			candidates.add(begin + searchPart + "." + s);
 		    }
-		    break;
-		} else {
-		    double d = score(s, sugestion, 0);
-		    if (d != 0.0) {
+		});
+	    } else if (sect.charAt(sect.length() - 1) == '.') {
+		searchPart = sect.substring(0,sect.length() - 1);
+		sugestion = "";
+		Transaction.withTransaction(true, new TransactionalCommand() {
+		    public void doIt() {
+			Object o = cx.evaluateString(scope, searchPart, "<auto-complete>", 0, null);
+			for (Object k : ((Scriptable) o).getIds()) {
+			    String s = Context.toString(k);
+			    values.add(s);
+			}
+			if (((Scriptable) o).getPrototype() != null) {
+			    for (Object k : ((Scriptable) o).getPrototype().getIds()) {
+				String s = Context.toString(k);
+				values.add(s);
+			    }
+			}
+		    }
+		});
+	    } else {
+		searchPart = sect.substring(0, sep);
+		sugestion = sect.substring(sep + 1);
+		Transaction.withTransaction(true, new TransactionalCommand() {
+		    public void doIt() {
+			Object o = cx.evaluateString(scope, searchPart, "<auto-complete>", 0, null);
+			for (Object k : ((Scriptable) o).getIds()) {
+			    String s = Context.toString(k);
+			    values.add(s);
+			}
+			if (((Scriptable) o).getPrototype() != null) {
+			    for (Object k : ((Scriptable) o).getPrototype().getIds()) {
+				String s = Context.toString(k);
+				values.add(s);
+			    }
+			}
+		    }
+		});
+	    }
+
+	    for (String s : values) {
+		if (!s.contains("from")) {
+		    if (s.equals(sugestion)) {
+			candidates.clear();
 			if (sep == -1) {
-			    candidates.add(begin + s);
+			    candidates.add(s);
 			} else {
-			    candidates.add(begin + searchPart + "." + s);
+			    candidates.add(searchPart + "." + s);
+			}
+			break;
+		    } else {
+			double d = score(s, sugestion, 0);
+			if (d != 0.0) {
+			    if (sep == -1) {
+				candidates.add(searchPart + s);
+			    } else {
+				candidates.add(searchPart + "." + s);
+			    }
 			}
 		    }
 		}
 	    }
+	    return 0;
+	} catch (RhinoException e) {
 	}
 	return 0;
     }
@@ -323,7 +333,7 @@ public class SemanticIntrospection implements Completor {
 		    paren--;
 		    size++;
 		}
-	    } else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '$' || c == '.') {
+	    } else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '$' ) {
 		size++;
 	    } else {
 		break;

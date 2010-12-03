@@ -3,6 +3,7 @@ package com.surftheedge.tesseract;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.surftheedge.tesseract.config.Config;
 import com.surftheedge.tesseract.stack.Stack;
 import com.surftheedge.tesseract.utils.Loader;
 
@@ -22,11 +23,10 @@ public class Main {
 		configPath = args[++i];
 	    }
 	}
-	Loader.init(configPath);
 	Stack.init();
 	if (useJavaScript){
 	    System.out.println("Using JavaScript interface");
-	    new JSConsole(runtimeEnv).exec();
+	    new JSConsole(runtimeEnv,configPath).exec();
 	}else{
 	    System.out.println("Using MJava interface");
 	    MJava.main();
