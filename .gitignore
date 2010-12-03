@@ -8,3 +8,4 @@ tests/*/*.result/.project
 /.classpath
 /.project
 /.classpath
+/build
