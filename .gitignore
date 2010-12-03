@@ -4,4 +4,7 @@
 bin/*
 build/*
 lib/mjava.jar
-tests/*/*.result
+tests/*/*.result/.project
+/.classpath
+/.project
+/.classpath
