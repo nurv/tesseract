@@ -9,3 +9,7 @@ tests/*/*.result/.project
 /.project
 /.classpath
 /build
+/build
+/.project
+/.project
+/.classpath
