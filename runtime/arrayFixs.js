@@ -42,3 +42,6 @@ if (!Array.prototype.reduce) {
 		return rv;
 	};
 }
+Array.prototype.toString = function (){
+    return "[" + this.reduce(function (x,y) { return x + "," + y }) + "]";
+}

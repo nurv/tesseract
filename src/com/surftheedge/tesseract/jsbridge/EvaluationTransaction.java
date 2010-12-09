@@ -16,7 +16,7 @@ public class EvaluationTransaction implements TransactionalCommand {
     String source;
     Context cx;
     Scriptable scope;
-    Function function;
+    private Object result;
 
     public EvaluationTransaction(Context cx, Scriptable scope, String source) {
 	this.source = source;
@@ -24,28 +24,18 @@ public class EvaluationTransaction implements TransactionalCommand {
 	this.scope = scope;
     }
 
-    public EvaluationTransaction(Context cx, Scriptable scope, Function function) {
-	this.function = function;
-	this.cx = cx;
-	this.scope = scope;
-    }
-
     public void doIt() {
 	cx.setErrorReporter(new ToolErrorReporter(false, System.out));
 	try {
-	    Object result;
-	    if (this.function != null){
-		result = this.function.call(cx, scope, this.function, new Object[]{});
-	    }else{
-		result = cx.evaluateString(scope, source, "<cmd>", 1, null);
-	    }
+	    Object result = cx.evaluateString(scope, source, "<cmd>", 1, null);
 
 	    // Avoid printing out undefined or function definitions.
 	    if (result != Context.getUndefinedValue() && !(result instanceof Function && source.trim().startsWith("function"))) {
 		try {
-		    if (result instanceof NativeJavaObject && ((NativeJavaObject)result).unwrap() instanceof RelationList){
-			System.out.println("#<RelationList: size " + ((RelationList)((NativeJavaObject) result).unwrap()).size() + ">");
-		    }else{
+		    if (result instanceof NativeJavaObject && ((NativeJavaObject) result).unwrap() instanceof RelationList) {
+			System.out.println("#<RelationList: size " + ((RelationList) ((NativeJavaObject) result).unwrap()).size()
+				+ ">");
+		    } else {
 			System.out.println(Context.toString(result));
 		    }
 		} catch (RhinoException rex) {
@@ -59,6 +49,14 @@ public class EvaluationTransaction implements TransactionalCommand {
 	}
 	// NativeArray h = global.history;
 	// h.put((int) h.getLength(), h, source);
+    }
+
+    public void setResult(Object result) {
+	this.result = result;
+    }
+
+    public Object getResult() {
+	return result;
     }
 
 }

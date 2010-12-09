@@ -1,3 +1,13 @@
+/* -*- Mode: Javascript -*-
+ * -*- coding: UTF-8 -*-
+ * Copyright (C) 2010 by Artur Ventura
+ *
+ * File: table.js
+ * Time-stamp: Sat Dec 09 10:10:00 2010
+ *
+ * Author: Artur Ventura
+ */
+
 (function() {
     function clone(obj) {
 		var newObj = (obj instanceof Array) ? [] : {};

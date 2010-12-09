@@ -1,3 +1,13 @@
+/* -*- Mode: Javascript -*-
+ * -*- coding: UTF-8 -*-
+ * Copyright (C) 2010 by Artur Ventura
+ *
+ * File: autoComplete.js
+ * Time-stamp: Sat Dec 09 10:09:00 2010
+ *
+ * Author: Artur Ventura
+ */
+
 (function() {
 	function reverseParser(sect) {
 		var size = 0;

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -15,6 +16,8 @@ import jline.ConsoleReader;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.EvaluatorException;
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
 
 import pt.ist.fenixframework.pstm.Transaction;
@@ -33,27 +36,41 @@ public class JSConsole {
     private HashMap<String, File> loadedFiles = new HashMap<String, File>();
     public ConsoleReader reader;
     private Scriptable config;
+    private ArrayList<String> toExecute = new ArrayList<String>();
 
-    public JSConsole(List<String> importDirectory, String configFile) throws IOException {
+    public JSConsole(List<String> importDirectory, String configFile, String[] args) throws IOException {
 	this.importDirectory = importDirectory;
 	cx = Context.enter();
-	scope = new TopLevelContext(cx,this);
+	scope = new TopLevelContext(cx, this);
 	config = Config.newConfig(configFile);
 	Scriptable env = cx.newObject(scope);
 	env.put("config", env, config);
-	env.put("engine", env, cx.getWrapFactory().wrapNewObject(cx, env,this));
+	env.put("engine", env, cx.getWrapFactory().wrapNewObject(cx, env, this));
 	scope.put("tesseract", scope, env);
-    	Loader.load(config);
-	
+	Loader.load(config);
+	processArguments(args);
 	if (System.console() != null) {
 	    reader = new ConsoleReader();
-	    reader.addCompletor(new SemanticIntrospection(cx,scope));
+	    reader.addCompletor(new SemanticIntrospection(cx, scope));
 	}
-	cx.evaluateString(scope, "importClass(Packages." + Config.get("rootClass",config) + ");", "<boot>", 0, null);
+	cx.evaluateString(scope, "importClass(Packages." + Config.get("rootClass", config) + ");", "<boot>", 0, null);
     }
-    
-    public static JSConsole getEngine(Context cx, Scriptable scope){
-	return (JSConsole) cx.evaluateString(scope, "tesseract.engine", "<getEngine>", 0, null);
+
+    private void processArguments(String[] args) {
+	for (String string : args) {
+	    if (string.startsWith("-d")) {
+		String property = string.substring(2);
+		String key = property.substring(0, property.indexOf(":"));
+		String value = property.substring(property.indexOf(":") + 1);
+		Config.set(key, value, cx, scope);
+	    } else if (string.startsWith("-e")) {
+		toExecute.add(string.substring(2));
+	    }
+	}
+    }
+
+    public static JSConsole getEngine(Context cx, Scriptable scope) {
+	return (JSConsole) ((NativeJavaObject) cx.evaluateString(scope, "tesseract.engine", "<getEngine>", 0, null)).unwrap();
     }
 
     public String reader(BufferedReader in) {
@@ -63,13 +80,19 @@ public class JSConsole {
 	    String newline;
 	    try {
 		if (System.console() != null) {
-		    String prompt ;
-		    if (Config.JSbool(Config.get("canWrite", config)) && !Config.JSbool(Config.get("notWarnWhenCanWrite", config))){
-			prompt = "\u001b[1;41m" + prompts + " *Write Mode ON*>\u001b[m";    
+		    String prompt;
+		    if (!Config.JSbool(Config.get("prompt", config)) && Config.get("prompt", config) instanceof Function) {
+			if (Config.JSbool(Config.get("canWrite", config))
+				&& !Config.JSbool(Config.get("notWarnWhenCanWrite", config))) {
+			    prompt = "\u001b[1;41m" + prompts + " *Write Mode ON*>\u001b[m";
+			} else {
+			    prompt = prompts + ">";
+			}
 		    }else{
-			prompt = prompts + ">";
+			Function fn = (Function) Config.get("prompt", config);
+			prompt = Context.toString(fn.call(cx, scope, fn, new Object[]{}));
 		    }
-		    newline = reader.readLine(wrote ?  "" : prompt + " ");
+		    newline = reader.readLine(wrote ? "" : prompt);
 		    wrote = true;
 		} else {
 		    newline = in.readLine();
@@ -121,7 +144,8 @@ public class JSConsole {
 		break;
 	    }
 
-	    Transaction.withTransaction(!Config.JSbool(Config.get("canWrite", cx,scope)), new EvaluationTransaction(cx, scope, source));
+	    Transaction.withTransaction(!Config.JSbool(Config.get("canWrite", cx, scope)), new EvaluationTransaction(cx, scope,
+		    source));
 	}
 	if (System.console() != null) {
 	    ps.println();
@@ -154,8 +178,8 @@ public class JSConsole {
 	    try {
 		FileReader fir = new FileReader(file);
 		BufferedReader br = new BufferedReader(fir);
-		if (Config.JSbool(Config.get("verboseLoading", cx,scope))){
-		    System.out.println("loaded: " + f.getKey());
+		if (Config.JSbool(Config.get("verbose", cx, scope))) {
+		    System.out.println("Load RT file: " + f.getKey());
 		}
 		loopFile(br, f.getKey());
 	    } catch (FileNotFoundException e) {
@@ -165,10 +189,17 @@ public class JSConsole {
     }
 
     public void exec() {
-	BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 	loadResources();
-	System.out.println("");
-	loopSource(in);
+	if (toExecute.size() > 0) {
+	    for (String string : toExecute) {
+		Transaction.withTransaction(!Config.JSbool(Config.get("canWrite", cx, scope)), new EvaluationTransaction(cx,
+			scope, string));
+	    }
+	} else {
+	    System.out.println("");
+	    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+	    loopSource(in);
+	}
     }
 
 }

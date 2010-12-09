@@ -1,5 +1,9 @@
-#!/bin/bash
-export TESSERACT_APP_PATH="/Users/nurv/workspace/Fears/war/WEB-INF/lib/*:/Users/nurv/workspace/Fears/war/WEB-INF/classes"
+#!/usr/bin/perl
+##!/bin/bash
+#export TESSERACT_APP_PATH="/Users/nurv/workspace/Fears/war/WEB-INF/lib/*:/Users/nurv/workspace/Fears/war/WEB-INF/classes"
 #export TESSERACT_APP_PATH="/home/nurv/bolsa/workspace/fenix/web/WEB-INF/lib/*:/home/nurv/bolsa/workspace/fenix/web/WEB-INF/classes"
 # 
-java -server -da -dsa -Xms756m -Xmx2000m -XX:MaxPermSize=400m -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:ParallelGCThreads=2 -XX:+CMSParallelRemarkEnabled  -classpath "$TESSERACT_APP_PATH:lib/*" com.surftheedge.tesseract.Main $*
+#java  $*
+
+my $TESSERACT_APP_PATH = "/Users/nurv/workspace/Fears/war/WEB-INF/lib/*:/Users/nurv/workspace/Fears/war/WEB-INF/classes";
+exec "java", "-server", "-da", "-dsa", "-Xms756m", "-Xmx2000m", "-XX:MaxPermSize=400m", "-XX:+UseConcMarkSweepGC", "-XX:+UseParNewGC", "-XX:ParallelGCThreads=2", "-XX:+CMSParallelRemarkEnabled", "-classpath", "$TESSERACT_APP_PATH:lib/*", "com.surftheedge.tesseract.Main", @ARGV

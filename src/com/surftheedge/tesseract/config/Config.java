@@ -32,8 +32,12 @@ public class Config {
 	}
     }
     
+    public static void set(String property, String value, Context cx, Scriptable scope){
+	cx.evaluateString(scope, "tesseract.config." + property + "="+value + ";", "<boot>", 0, null);
+    }
+    
     public static boolean JSbool(Object obj){
-	if (obj == null || obj.equals(new Boolean(false)) || "undefined".equals(obj)){
+	if (obj == null || obj.equals(new Boolean(false)) || "undefined".equals(obj) || Context.getUndefinedValue().equals(obj)){
 	    return false;
 	}else{
 	    return true;

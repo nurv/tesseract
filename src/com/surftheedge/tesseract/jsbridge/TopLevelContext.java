@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
@@ -23,7 +25,7 @@ import com.surftheedge.tesseract.config.Config;
 public class TopLevelContext extends ImporterTopLevel {
 
     private static final long serialVersionUID = 1L;
-    public static String[] names = { "map", "reduce", "filter", "print", "printf", "typeOf", "find","run","reloadRuntime","slurp",};
+    public static String[] names = { "map", "reduce", "filter", "print", "printf", "typeOf", "find","run","reloadRuntime","slurp","objectKeys","scope"};
     public TopLevelContext() {
     }
 
@@ -140,6 +142,51 @@ public class TopLevelContext extends ImporterTopLevel {
 	}else{
 	    return args[0].getClass().getName();
 	}
+    }
+    
+    public static Object objectKeys(Context cx, Scriptable scope, Object[] args, Function funObj) {
+	Scriptable obj = (Scriptable) args[0];
+	Set<String> collection = new HashSet<String>();
+	for (Object k : obj.getIds()) {
+	    String s = Context.toString(k);
+	    collection.add(s);
+	}
+	if (obj.getPrototype() != null) {
+	    for (Object k : obj.getPrototype().getIds()) {
+		String s = Context.toString(k);
+		collection.add(s);
+	    }
+	}
+	
+	return setToArray(cx, scope, collection);
+    }
+    
+    public static Object scope(Context cx, Scriptable scope, Object[] args, Function funObj) {
+	Set<String> collection = new HashSet<String>();
+	for (Object k : scope.getIds()) {
+	    String s = Context.toString(k);
+	    collection.add(s);
+	}
+	if (scope.getParentScope() != null) {
+	    for (Object k : scope.getParentScope().getIds()) {
+		String s = Context.toString(k);
+		collection.add(s);
+	    }
+	}
+	for(String name : names){
+	    collection.add(name);
+	}
+	
+	return setToArray(cx, scope, collection);
+    }
+
+    private static NativeArray setToArray(Context cx, Scriptable scope, Set<String> collection) {
+	int i=0;
+	NativeArray na = (NativeArray) cx.newArray(scope, collection.size());
+	for (String string : collection) {
+	    na.put(i++, na, string);
+	}
+	return na;
     }
 
 }
