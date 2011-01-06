@@ -8,9 +8,9 @@
  * Author: Artur Ventura
  */
 
-/*if (Packages.net.sourceforge.fenixedu.domain.RootDomainObject) {
+if (Packages.net.sourceforge.fenixedu.domain.RootDomainObject) {
     Packages.net.sourceforge.fenixedu.domain.RootDomainObject.init();
-    importClass(Packages.net.sourceforge.fenixedu.domain.RootDomainObject);
-}else if (Packages.eu.ist.fears.server.domain.FearsApp) {
-    importClass(Packages.eu.ist.fears.server.domain.FearsApp);
+    Packages.net.sourceforge.fenixedu.applicationTier.FenixService.init(Packages.net.sourceforge.fenixedu.domain.RootDomainObject.getInstance());
+    Packages.net.sourceforge.fenixedu.applicationTier.Servico.content.CreateMetaDomainObectTypes.run();
+}/*else if (Packages.eu.ist.fears.server.domain.FearsApp) {
 }*/

@@ -75,14 +75,14 @@
             importClass(Packages.pt.ist.fenixframework.FenixFramework);
             var types = from(this.objects).types().toArray()
             var slots = new java.util.HashSet();
-            var relations = new java.util.HashSet();
+            var relations = new java.util.HashMap();
             for (var i= 0; i < types.length; i++){
                 var clazz = types[i];
-                map(FenixFramework.getDomainModel().findClass(clazz).getSlotsList(), function(o){
+                map(Packages.com.surftheedge.tesseract.utils.EffectiveClass.getEffecitveSlots(clazz), function(o){
                     slots.add(o.getName());
                 });
-                map(FenixFramework.getDomainModel().findClass(clazz).getRoleSlotsList(), function(o){
-                   relations.add([clazz,o]); 
+                map(Packages.com.surftheedge.tesseract.utils.EffectiveClass.getEffecitveRelations(clazz), function(o){
+                   relations.put(o.getName(),[clazz,o]); 
                 });
             }
             var efSlots = map(slots,function(o){
@@ -95,12 +95,13 @@
                 }
               }
             });
-            var efRel = map(relations,function(v){
+            var efRel = map(relations.keySet(),function(s){
+            	var v = relations.get(s);
                 var r = v[1];
                 var clazz = v[0];
                 var x = "" + r.getName();
                 return {label:x,func:function(o){
-                    if (o.getClass().getName().equals(clazz)) {
+                    if (o.getClass().getName().equals(clazz) || o[tesseract.utils.getter(x)]) {
                     if (r.getMultiplicityUpper() == 1) {
     					var k = o[tesseract.utils.getter(x)]()
     					var xinobi;

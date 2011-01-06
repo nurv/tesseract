@@ -11,17 +11,28 @@ import org.mozilla.javascript.tools.ToolErrorReporter;
 
 import pt.ist.fenixframework.pstm.IllegalWriteException;
 import pt.ist.fenixframework.pstm.RelationList;
+import pt.ist.fenixframework.pstm.Transaction;
+
+import com.surftheedge.tesseract.config.Config;
 
 public class EvaluationTransaction implements TransactionalCommand {
-    String source;
-    Context cx;
-    Scriptable scope;
+    private String source;
+    private Context cx;
+    private Scriptable scope;
     private Object result;
 
     public EvaluationTransaction(Context cx, Scriptable scope, String source) {
 	this.source = source;
 	this.cx = cx;
 	this.scope = scope;
+    }
+
+    public static void transactionEnvironment(EvaluationTransaction et){
+	if(Config.JSbool(Config.get("disableTransactions", et.cx, et.scope))){
+	    et.doIt();
+	}else{
+	    Transaction.withTransaction(!Config.JSbool(Config.get("canWrite", et.cx, et.scope)), et);
+	}
     }
 
     public void doIt() {

@@ -88,9 +88,9 @@ public class JSConsole {
 			} else {
 			    prompt = prompts + ">";
 			}
-		    }else{
+		    } else {
 			Function fn = (Function) Config.get("prompt", config);
-			prompt = Context.toString(fn.call(cx, scope, fn, new Object[]{}));
+			prompt = Context.toString(fn.call(cx, scope, fn, new Object[] {}));
 		    }
 		    newline = reader.readLine(wrote ? "" : prompt);
 		    wrote = true;
@@ -143,8 +143,7 @@ public class JSConsole {
 	    if (source == null) {
 		break;
 	    }
-
-	    Transaction.withTransaction(!Config.JSbool(Config.get("canWrite", cx, scope)), new EvaluationTransaction(cx, scope,
+	    EvaluationTransaction.transactionEnvironment(new EvaluationTransaction(cx, scope,
 		    source));
 	}
 	if (System.console() != null) {
@@ -192,8 +191,7 @@ public class JSConsole {
 	loadResources();
 	if (toExecute.size() > 0) {
 	    for (String string : toExecute) {
-		Transaction.withTransaction(!Config.JSbool(Config.get("canWrite", cx, scope)), new EvaluationTransaction(cx,
-			scope, string));
+		EvaluationTransaction.transactionEnvironment(new EvaluationTransaction(cx, scope, string));
 	    }
 	} else {
 	    System.out.println("");
@@ -201,5 +199,4 @@ public class JSConsole {
 	    loopSource(in);
 	}
     }
-
 }

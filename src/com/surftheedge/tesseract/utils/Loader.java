@@ -13,16 +13,16 @@ public class Loader {
     public static void load(final Scriptable configuration) {
 	if (!loaded) {
 	    final Class r00tClass;
-	    final Class modelClass;
+	    final Class mClass;
 	    pt.ist.fenixframework.Config config = null;
 
 	    String rootClassName = (String) Config.get("rootClass",configuration);
 	    try {
 		r00tClass = Class.forName(rootClassName);
 		if (Config.get("domainModelClass",configuration) != null) {
-		    modelClass = Class.forName((String) Config.get("domainModelClass",configuration));
+		    mClass = Class.forName((String) Config.get("domainModelClass",configuration));
 		} else {
-		    modelClass = null;
+		    mClass = null;
 		}
 		config = new pt.ist.fenixframework.Config() {
 		    {
@@ -42,6 +42,7 @@ public class Loader {
 			dbUsername = (String) Config.get("dbUsername",configuration);
 			dbPassword = (String) Config.get("dbPassword",configuration);
 			rootClass = r00tClass;
+			domainModelClass = mClass;
 			updateRepositoryStructureIfNeeded = (Boolean) Config.get("updateRepositoryStructureIfNeeded",configuration);
 		    }
 		};
