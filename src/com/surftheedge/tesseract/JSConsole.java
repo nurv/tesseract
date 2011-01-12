@@ -81,16 +81,16 @@ public class JSConsole {
 	    try {
 		if (System.console() != null) {
 		    String prompt;
-		    if (!Config.JSbool(Config.get("prompt", config)) && Config.get("prompt", config) instanceof Function) {
-			if (Config.JSbool(Config.get("canWrite", config))
-				&& !Config.JSbool(Config.get("notWarnWhenCanWrite", config))) {
-			    prompt = "\u001b[1;41m" + prompts + " *Write Mode ON*>\u001b[m";
-			} else {
-			    prompt = prompts + ">";
-			}
-		    } else {
+		    if (Config.JSbool(Config.get("prompt", config)) && Config.get("prompt", config) instanceof Function) {
 			Function fn = (Function) Config.get("prompt", config);
 			prompt = Context.toString(fn.call(cx, scope, fn, new Object[] {}));
+		    } else {
+			if (Config.JSbool(Config.get("canWrite", config))
+				&& !Config.JSbool(Config.get("notWarnWhenCanWrite", config))) {
+			    prompt = "\u001b[1;41m" + prompts + " *Write Mode ON*>\u001b[m ";
+			} else {
+			    prompt = prompts + "> ";
+			}
 		    }
 		    newline = reader.readLine(wrote ? "" : prompt);
 		    wrote = true;
